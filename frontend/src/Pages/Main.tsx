@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
-const Main = () => {
+const Main: React.FC = () => {
 
     const nav = useNavigate();
 
@@ -15,7 +15,8 @@ const Main = () => {
       Tailwind CSS 작동 중!
       <div>
         <button onClick={() => nav('/login')}>로그인</button> <br />
-        <button onClick={() => nav('/join')}>회원가입</button>
+        <button onClick={() => nav('/join')}>회원가입</button> <br />
+        <button onClick={() => nav('/list')}>리스트</button> <br />
       </div>
     </div>
   );
