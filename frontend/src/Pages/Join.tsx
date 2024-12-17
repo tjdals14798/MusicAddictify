@@ -1,17 +1,41 @@
 import { FormEvent, useState } from "react";
+import Instance from "../../axios";
 import dayjs from "dayjs";
 
 const Join: React.FC = () => {
   const [joinId, setJoinId] = useState<string>("");
   const [joinPw, setJoinPw] = useState<string>("");
   const [joinName, setJoinName] = useState<string>("");
-  const [joinDate, setJoinDate] = useState<string>("");
+  const [joinBirthDate, setJoinBirthDate] = useState<string>("");
 
-  const handleJoin = (e: FormEvent): void => {
+  const handleJoin = async (e: FormEvent) => {
     e.preventDefault();
-    alert(
-      `가입 성공!\n아이디: ${joinId}\n이름: ${joinName}\n생년월일: ${joinDate}`
-    );
+
+    // YYYYMMDD 유효성 검사
+    const dateRegex = /^\d{4}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/;
+    if (!dateRegex.test(joinBirthDate)) {
+      alert("생년월일은 YYYYMMDD 형식으로 입력해주세요 (예: 19991116)");
+      return;
+    }
+
+    try {
+      const reqData = {
+        id: joinId,
+        pw: joinPw,
+        name: joinName,
+        birthDate: dayjs(joinBirthDate, "YYYYMMDD").format("YYYY-MM-DD"),
+      };
+
+      const res = await Instance.post("/users/join", reqData);
+
+      console.log(res.data);
+      alert(
+        `가입 성공!\n아이디: ${joinId}\n이름: ${joinName}\n생년월일: ${joinBirthDate}`
+      );
+    } catch (error: any) {
+      console.error("회원가입 실패", error.response?.data || error.message);
+      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -67,15 +91,13 @@ const Join: React.FC = () => {
             <input
               id="JoinDate"
               name="JoinDate"
-              type="date"
-              min="1950-01-01"
-              max={dayjs().format("YYYY-MM-DD")} // 오늘 날짜까지
+              type="text"
+              maxLength={8}
               required
-              autoComplete="bday"
-              placeholder="생년월일"
-              value={joinDate}
+              placeholder="생년월일 8자리"
+              value={joinBirthDate}
               onChange={(e) => {
-                setJoinDate(e.target.value);
+                setJoinBirthDate(e.target.value);
               }}
               className="block w-full h-12 px-3 py-2 text-base text-gray-900 placeholder-gray-400 border border-gray-300 focus:z-10 focus:outline-indigo-600 focus:ring-indigo-600 sm:text-sm border-t-0 rounded-b-md"
             />

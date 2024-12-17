@@ -7,7 +7,12 @@ interface MusicListItemProps {
   views: string;
 }
 
-const ListItem: React.FC<MusicListItemProps> = ({ thumbnail, title, composer, views }) => {
+const ListItem: React.FC<MusicListItemProps> = ({
+  thumbnail,
+  title,
+  composer,
+  views,
+}) => {
   return (
     <li className="flex items-center py-4 hover:bg-gray-50 transition">
       {/* 썸네일 */}
