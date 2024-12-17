@@ -15,7 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: 'postgres',
       password: 'postgres', // 하드코딩된 비밀번호
       database: 'postgres',
-      entities: [__dirname + '/../**/*.entity.{js,ts}'],
+      entities: [],
       synchronize: true,
     }),
     UsersModule,
