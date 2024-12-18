@@ -23,15 +23,13 @@ const Join: React.FC = () => {
         id: joinId,
         pw: joinPw,
         name: joinName,
-        birthDate: dayjs(joinBirthDate, "YYYYMMDD").format("YYYY-MM-DD"),
+        birthDate: joinBirthDate,
       };
 
       const res = await Instance.post("/users/join", reqData);
+      const { id, name } = res.data;
 
-      console.log(res.data);
-      alert(
-        `가입 성공!\n아이디: ${joinId}\n이름: ${joinName}\n생년월일: ${joinBirthDate}`
-      );
+      alert(`가입 성공!\n아이디: ${id}\n이름: ${name}`);
     } catch (error: any) {
       console.error("회원가입 실패", error.response?.data || error.message);
       alert("회원가입에 실패했습니다. 다시 시도해주세요.");
