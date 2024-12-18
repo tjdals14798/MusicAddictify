@@ -9,16 +9,6 @@ import { PrismaModule } from './prisma/prisma.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: '127.0.0.1',
-    //   port: 5432,
-    //   username: 'postgres',
-    //   password: 'postgres', // 하드코딩된 비밀번호
-    //   database: 'postgres',
-    //   entities: [],
-    //   synchronize: true,
-    // }),
     UsersModule,
     PrismaModule,
   ],
