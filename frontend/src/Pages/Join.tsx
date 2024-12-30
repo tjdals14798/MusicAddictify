@@ -26,8 +26,12 @@ const Join: React.FC = () => {
         birthDate: joinBirthDate,
       };
 
+<<<<<<< HEAD
       const res = await Instance.post("/users/join", reqData);
       const { id, name } = res.data;
+=======
+      const res = await Instance.post("/auth/join", reqData);
+>>>>>>> front
 
       alert(`가입 성공!\n아이디: ${id}\n이름: ${name}`);
     } catch (error: any) {

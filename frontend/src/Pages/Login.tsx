@@ -1,25 +1,17 @@
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import Instance from "../../axios";
 
 const Login: React.FC = () => {
   const [loginId, setLoginId] = useState<string>("");
   const [loginPw, setLoginPw] = useState<string>("");
 
-  const handelLogin = async (e: FormEvent) => {
+  const handelLogin = (e: FormEvent): void => {
     e.preventDefault();
 
-    const reqData = {
-      id: loginId,
-      pw: loginPw,
-    };
-
-    try {
-      const res = await Instance.post("/users/login", reqData);
-      console.log(res);
-      alert(`로그인 성공!\n아이디: ${res.data.id}\n이름: ${res.data.name}`);
-    } catch (error: any) {
-      alert(error.response.data.message || "로그인 실패");
+    if (loginId === "admin" && loginPw === "1234") {
+      alert("로그인 대대성공");
+    } else {
+      alert("로그인 실패");
     }
   };
 
