@@ -26,7 +26,7 @@ const Join: React.FC = () => {
         birthDate: dayjs(joinBirthDate, "YYYYMMDD").format("YYYY-MM-DD"),
       };
 
-      const res = await Instance.post("/users/join", reqData);
+      const res = await Instance.post("/auth/join", reqData);
 
       console.log(res.data);
       alert(

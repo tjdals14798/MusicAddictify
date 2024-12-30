@@ -1,18 +1,20 @@
 import { FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Instance from "../../axios";
 
 const Login: React.FC = () => {
   const [loginId, setLoginId] = useState<string>("");
   const [loginPw, setLoginPw] = useState<string>("");
-
-  const handelLogin = (e: FormEvent): void => {
+  const nav = useNavigate();
+  const handelLogin = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (loginId === "admin" && loginPw === "1234") {
-      alert("로그인 대대성공");
-    } else {
-      alert("로그인 실패");
-    }
+    const reqData = {
+      id: loginId,
+      pw: loginPw,
+    };
+    const res = await Instance.post("/auth/login", reqData);
+    alert(res.data.message);
+    nav('/');
   };
 
   return (
