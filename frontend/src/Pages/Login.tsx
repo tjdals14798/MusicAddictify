@@ -1,17 +1,33 @@
 import { FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Instance from "../../axios";
 
 const Login: React.FC = () => {
   const [loginId, setLoginId] = useState<string>("");
   const [loginPw, setLoginPw] = useState<string>("");
+  const nav = useNavigate();
 
-  const handelLogin = (e: FormEvent): void => {
+  const handelLogin = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (loginId === "admin" && loginPw === "1234") {
-      alert("로그인 대대성공");
-    } else {
-      alert("로그인 실패");
+    try {
+      const reqData = { id: loginId, pw: loginPw }; // 입력된 ID와 PW를 요청 데이터로 구성
+      const res = await Instance.post("/auth/login", reqData, {
+        withCredentials: true, // 쿠키를 포함하여 요청
+      });
+
+      // 성공 시 액세스 토큰 확인
+      console.log("로그인 성공:", res.data.message);
+      console.log("JWT 쿠키 저장됨");
+
+      // 메인 페이지로 이동
+      nav("/");
+    } catch (error: any) {
+      console.error(
+        "로그인 실패:",
+        error.response?.data?.message || error.message
+      );
+      alert(error.response?.data?.message || "로그인에 실패했습니다.");
     }
   };
 

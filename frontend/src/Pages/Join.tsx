@@ -26,17 +26,13 @@ const Join: React.FC = () => {
         birthDate: joinBirthDate,
       };
 
-<<<<<<< HEAD
-      const res = await Instance.post("/users/join", reqData);
+      const res = await Instance.post("/auth/register", reqData);
       const { id, name } = res.data;
-=======
-      const res = await Instance.post("/auth/join", reqData);
->>>>>>> front
 
       alert(`가입 성공!\n아이디: ${id}\n이름: ${name}`);
     } catch (error: any) {
       console.error("회원가입 실패", error.response?.data || error.message);
-      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+      alert(error.response?.data?.message || "회원가입에 실패했습니다.");
     }
   };
 

@@ -1,7 +1,7 @@
-import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import Cookies from "js-cookie"; // 쿠키 처리 라이브러리
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode"; // jwt-decode 라이브러리
 import Instance from "../../axios";
 
 interface DecodedToken {
@@ -15,75 +15,107 @@ const Main: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
 
-    // 리프레시 토큰 요청 함수
-    const refreshAccessToken = async () => {
+  useEffect(() => {
+    const token = Cookies.get("jwt"); // 쿠키에서 JWT 가져오기
+    console.log("token", token);
+    if (token) {
+      console.log("true");
       try {
-        const response = await Instance.get("/auth/refresh", {
-          withCredentials: true, // 쿠키 포함
-        });
-        console.log(response.data)
-  
-        console.log("새로운 액세스 토큰:", response.data.accessToken);
-        Cookies.set("jwt", response.data.accessToken); // 새로운 JWT 저장
-        return response.data.accessToken;
+        // JWT 디코딩
+        const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
+        setUserId(decoded.id);
+        setUserName(decoded.name);
       } catch (error) {
-        console.error("리프레시 토큰 요청 중 오류 발생:", error);
-        return null;
+        console.error("Invalid JWT Token", error);
+        setUserId(null);
+        setUserName(null);
       }
-    };
-  
-    // JWT 토큰을 확인하고 사용자 정보를 설정
-    useEffect(() => {
-      const checkAndSetUser = async () => {
-        let token = Cookies.get("jwt");
-        console.log("JWT Token:", token);
-  
-        if (!token) {
-          // JWT 토큰이 없을 경우 리프레시 토큰 요청
-          console.warn("토큰 없음, 리프레시 시도");
-          token = await refreshAccessToken();
-          if (!token) {
-            console.error("리프레시 토큰으로도 액세스 토큰을 갱신하지 못함");
-            setUserId(null);
-            setUserName(null);
-            return;
-          }
-        }
-  
-        try {
-          // JWT 디코딩
-          const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
-  
-          // 토큰 만료 확인
-          if (decoded.exp && Date.now() >= decoded.exp * 1000) {
-            console.warn("Token expired, 리프레시 시도");
-            const newAccessToken = await refreshAccessToken();
-            if (!newAccessToken) {
-              setUserId(null);
-              setUserName(null);
-              Cookies.remove("jwt");
-              return;
-            }
-  
-            // 새로운 토큰을 기반으로 사용자 정보 업데이트
-            const newDecoded: DecodedToken = jwtDecode<DecodedToken>(newAccessToken);
-            setUserId(newDecoded.id);
-            setUserName(newDecoded.name);
-          } else {
-            // 사용자 정보 설정
-            setUserId(decoded.id);
-            setUserName(decoded.name);
-          }
-        } catch (error) {
-          console.error("Invalid token:", error);
-          setUserId(null);
-          setUserName(null);
-          Cookies.remove("jwt");
-        }
-      };
-  
-      checkAndSetUser();
-    }, []);
+    }
+  }, []);
+
+  // 리프레시 토큰 요청 함수
+  // const refreshAccessToken = async () => {
+  //   try {
+  //     const response = await Instance.get("/auth/refresh", {
+  //       withCredentials: true, // 쿠키 포함
+  //     });
+
+  //     console.log("새로운 액세스 토큰:", response.data.accessToken);
+  //     Cookies.set("jwt", response.data.accessToken); // 새로운 JWT 저장
+  //     return response.data.accessToken;
+  //   } catch (error) {
+  //     console.error("리프레시 토큰 요청 중 오류 발생:", error);
+  //     return null;
+  //   }
+  // };
+
+  // JWT 토큰을 확인하고 사용자 정보를 설정
+  // useEffect(() => {
+  //   const checkAndSetUser = async () => {
+  //     let token = Cookies.get("jwt");
+  //     console.log("JWT Token:", token);
+
+  //     if (token) {
+  //       console.log('true')
+  //       try {
+  //         // JWT 디코딩
+  //         const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
+  //         setUserId(decoded.id);
+  //         setUserName(decoded.name);
+  //       } catch (error) {
+  //         console.error("Invalid JWT Token", error);
+  //         setUserId(null);
+  //         setUserName(null);
+  //       }
+  //     }
+
+  //     // if (!token) {
+  //     //   // JWT 토큰이 없을 경우 리프레시 토큰 요청
+  //     //   console.warn("토큰 없음, 리프레시 시도");
+  //     //   token = await refreshAccessToken();
+  //     //   if (!token) {
+  //     //     console.error("리프레시 토큰으로도 액세스 토큰을 갱신하지 못함");
+  //     //     setUserId(null);
+  //     //     setUserName(null);
+  //     //     return;
+  //     //   }
+  //     // }
+
+  //     // try {
+  //     //   // JWT 디코딩
+  //     //   const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
+  //     //   console.log(decoded);
+
+  //     //   // 토큰 만료 확인
+  //     //   if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+  //     //     console.warn("Token expired, 리프레시 시도");
+  //     //     const newAccessToken = await refreshAccessToken();
+  //     //     if (!newAccessToken) {
+  //     //       setUserId(null);
+  //     //       setUserName(null);
+  //     //       Cookies.remove("jwt");
+  //     //       return;
+  //     //     }
+
+  //     //     // 새로운 토큰을 기반으로 사용자 정보 업데이트
+  //     //     const newDecoded: DecodedToken = jwtDecode<DecodedToken>(newAccessToken);
+  //     //     setUserId(newDecoded.id);
+  //     //     setUserName(newDecoded.name);
+  //     //   } else {
+  //     //     // 사용자 정보 설정
+  //     //     setUserId(decoded.id);
+  //     //     setUserName(decoded.name);
+  //     //   }
+  //     // } catch (error) {
+  //     //   console.error("Invalid token:", error);
+  //     //   setUserId(null);
+  //     //   setUserName(null);
+  //     //   Cookies.remove("jwt");
+  //     // }
+  //   };
+
+  //   checkAndSetUser();
+  // }, []);
 
   return (
     <div className="bg-blue-500 text-white text-center p-10 rounded-lg">
