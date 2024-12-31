@@ -1,8 +1,7 @@
-import React from 'react'
-import ListItem from '../Components/ListItem';
+import React from "react";
+import ListItem from "../Components/ListItem";
 
 const ListPage: React.FC = () => {
-
   const musicList = [
     {
       id: 1,
@@ -14,7 +13,7 @@ const ListPage: React.FC = () => {
     {
       id: 2,
       thumbnail: "https://via.placeholder.com/150",
-      title: "Song Title 2",
+      title: "Song Title 23",
       composer: "Composer Name 2",
       views: "950K",
     },
@@ -30,24 +29,24 @@ const ListPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
-    <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Top 100 Latest Songs
-      </h1>
-      <ul className="divide-y divide-gray-300">
-        {musicList.map((music) => (
-          <ListItem
-          key={music.id}
-          thumbnail={music.thumbnail}
-          title={music.title}
-          composer={music.composer}
-          views={music.views}
-        />
-        ))}
-      </ul>
+      <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+          Top 100 Latest Songs
+        </h1>
+        <ul className="divide-y divide-gray-300">
+          {musicList.map((music) => (
+            <ListItem
+              key={music.id}
+              thumbnail={music.thumbnail}
+              title={music.title}
+              composer={music.composer}
+              views={music.views}
+            />
+          ))}
+        </ul>
+      </div>
     </div>
-  </div>
-  )
-}
+  );
+};
 
-export default ListPage
+export default ListPage;
