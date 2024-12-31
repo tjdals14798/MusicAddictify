@@ -6,6 +6,7 @@ import axios, { AxiosInstance } from "axios";
 
 const Instance: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5173/api",
+  withCredentials: true, // 쿠키 포함
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",

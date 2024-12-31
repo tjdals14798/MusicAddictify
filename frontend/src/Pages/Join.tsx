@@ -26,7 +26,7 @@ const Join: React.FC = () => {
         birthDate: dayjs(joinBirthDate, "YYYYMMDD").format("YYYY-MM-DD"),
       };
 
-      const res = await Instance.post("/users/join", reqData);
+      const res = await Instance.post("/auth/register", reqData);
 
       console.log(res.data);
       alert(
@@ -34,7 +34,7 @@ const Join: React.FC = () => {
       );
     } catch (error: any) {
       console.error("회원가입 실패", error.response?.data || error.message);
-      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+      alert(error.response?.data?.message || "회원가입에 실패했습니다.");
     }
   };
 
