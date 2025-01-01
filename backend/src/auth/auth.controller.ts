@@ -1,8 +1,16 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JoinAuthDto } from './dto/join-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -20,40 +28,46 @@ export class AuthController {
     @Body() data: LoginAuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log(data);
-    const { accessToken, refreshToken } =
-      await this.authService.validateUser(data);
+    const user = await this.authService.validateUser(data);
 
-    // Access Token은 클라이언트에서 사용함
-    res.cookie('jwt', accessToken, { httpOnly: true }); // 쿠키 설정
-    // Refresh Token
-    res.cookie('refreshToken', refreshToken, {
+    if (!user)
+      throw new UnauthorizedException('아이디 또는 비밀번호가 잘못되었습니다.');
+
+    // Access Token 발급
+    const accessToken = await this.authService.generateAccessToken(user);
+
+    // Refresh Token 발급 및 쿠키 설정
+    const refreshToken = await this.authService.generateRefreshToken(user.id);
+    res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: true,
-      path: '/auth/refresh',
+      secure: process.env.NODE_ENV === 'production', // HTTPS 환경에서만 전송
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
-    return { message: '로그인 성공' };
+    return { accessToken };
   }
 
-  // @Get('refresh')
-  // async refresh(
-  //   @Req() req: Request,
-  //   @Res({ passthrough: true }) res: Response,
-  // ) {
-  //   const refreshToken = req.cookies['refreshToken'];
-  //   console.log('refresh 진입', refreshToken);
-  //   if (!refreshToken) {
-  //     throw new UnauthorizedException('Refresh Token이 없습니다.');
-  //   }
+  @Post('refresh')
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies['refresh_token'];
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh Token not found'); //찾을 수 없음
+    }
 
-  //   const newAccessToken =
-  //     await this.authService.refreshAccessToken(refreshToken);
-  //   console.log(newAccessToken, '컨트롤러');
-  //   res.cookie('jwt', newAccessToken, { httpOnly: true });
+    try {
+      const payload = this.authService.verifyRefreshToken(refreshToken);
+      const newAccessToken =
+        await this.authService.generateAccessToken(payload);
 
-  //   return { accessToken: newAccessToken };
-  // }
+      return { accessToken: newAccessToken };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid Refresh Token'); //유효하지 않음
+    }
+  }
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {

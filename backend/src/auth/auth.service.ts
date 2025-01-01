@@ -17,19 +17,6 @@ export class AuthService {
     private readonly jwtservice: JwtService,
   ) {}
 
-  // async validateUser(data: LoginAuthDto) {
-  //   const user = await this.prisma.user.findUnique({ where: { id: data.id } });
-
-  //   if (user && (await bcrypt.compare(data.pw, user.password))) {
-  //     const result = {
-  //       id: user.id,
-  //       name: user.name,
-  //     };
-  //     return result;
-  //   }
-  //   return null;
-  // }
-
   async createUser(data: JoinAuthDto) {
     const checkuser = await this.prisma.user.findFirst({
       where: { id: data.id },
@@ -53,44 +40,37 @@ export class AuthService {
     return user;
   }
 
-  async validateUser(data: LoginAuthDto) {
+  async validateUser(data: LoginAuthDto): Promise<any> {
     console.log('로그인 진입: ', data);
     const user = await this.prisma.user.findUnique({ where: { id: data.id } });
-    if (!user)
-      throw new UnauthorizedException('아이디 또는 비밀번호가 잘못되었습니다.');
+    if (!user) null;
 
     const isPasswordValid = await bcrypt.compare(data.pw, user.password);
     if (!isPasswordValid)
       throw new UnauthorizedException('아이디 또는 비밀번호가 잘못되었습니다.');
-    // JWT 토큰 발급
-    const accessToken = this.jwtservice.sign(
-      { id: user.id, name: user.name },
-      { secret: process.env.JWT_SECRET, expiresIn: '3m' },
-    );
 
-    const refreshToken = this.jwtservice.sign(
-      { id: user.id, name: user.name },
-      { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' },
-    );
-
-    return { accessToken, refreshToken };
+    return user;
   }
 
-  // async refreshAccessToken(refreshToken: string) {
-  //   console.log('refresh 진입');
-  //   try {
-  //     const payload = this.jwtservice.verify(refreshToken, {
-  //       secret: process.env.JWT_REFRESH_SECRET,
-  //     });
-  //     console.log('payload: ', payload);
-  //     const newAccessToken = this.jwtservice.sign(
-  //       { id: payload.id, name: payload.name },
-  //       { secret: process.env.JWT_SECRET, expiresIn: '15m' },
-  //     );
+  async generateAccessToken(user: any): Promise<string> {
+    const payload = { id: user.id, name: user.name };
+    return this.jwtservice.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '15m',
+    });
+  }
 
-  //     return newAccessToken;
-  //   } catch (error) {
-  //     throw new UnauthorizedException('유효하지 않은 Refresh Token입니다.');
-  //   }
-  // }
+  async generateRefreshToken(userId: string): Promise<string> {
+    const payload = { id: userId };
+    return this.jwtservice.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
+    });
+  }
+
+  verifyRefreshToken(token: string) {
+    return this.jwtservice.verify(token, {
+      secret: process.env.JWT_REFRESH_SECRET,
+    });
+  }
 }
