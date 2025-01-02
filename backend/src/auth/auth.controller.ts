@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   Res,
@@ -72,8 +73,11 @@ export class AuthController {
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     //passthrough: true => json응답을 위해 작성 하는것
-    res.clearCookie('jwt');
-    res.clearCookie('refreshToken');
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
     return { message: '로그아웃 성공' };
   }
 }

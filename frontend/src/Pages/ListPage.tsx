@@ -1,31 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import ListItem from "../Components/ListItem";
+import Instance_YT from "../../axios/yt_axios";
 
 const ListPage: React.FC = () => {
-  const musicList = [
-    {
-      id: 1,
-      thumbnail: "https://via.placeholder.com/150", // 예시 이미지 URL
-      title: "Song Title 1",
-      composer: "Composer Name 1",
-      views: "1.2M",
-    },
-    {
-      id: 2,
-      thumbnail: "https://via.placeholder.com/150",
-      title: "Song Title 23",
-      composer: "Composer Name 2",
-      views: "950K",
-    },
-    {
-      id: 3,
-      thumbnail: "https://via.placeholder.com/150",
-      title: "Song Title 3",
-      composer: "Composer Name 3",
-      views: "870K",
-    },
-    // 더미 데이터 추가 가능
-  ];
+  const [musicVideos, setMusicVideos] = useState<any[]>([]);
+  const testLoad = async () => {
+    const list = await Instance_YT.get("/videos", {
+      params: {
+        chart: "mostPopular",
+        videoCategoryId: "10", // 음악 카테고리 ID
+        regionCode: "KR",
+        maxResults: 10,
+      },
+    });
+    console.log(list);
+    setMusicVideos(
+      list.data.items.map((item: any) => ({
+        videoId: item.id,
+        thumbnail: item.snippet.thumbnails.medium.url,
+        title: item.snippet.title,
+        composer: item.snippet.channelTitle,
+        viewCount: item.statistics.viewCount,
+      }))
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
@@ -33,14 +31,15 @@ const ListPage: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
           Top 100 Latest Songs
         </h1>
+        <button onClick={testLoad}>gasdfasdf</button>
         <ul className="divide-y divide-gray-300">
-          {musicList.map((music) => (
+          {musicVideos.map((music) => (
             <ListItem
-              key={music.id}
+              key={music.videoId}
               thumbnail={music.thumbnail}
               title={music.title}
               composer={music.composer}
-              views={music.views}
+              views={music.viewCount}
             />
           ))}
         </ul>

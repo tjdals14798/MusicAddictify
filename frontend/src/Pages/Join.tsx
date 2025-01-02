@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import Instance from "../../axios";
+import Instance from "../../axios/axios";
 import dayjs from "dayjs";
 
 const Join: React.FC = () => {

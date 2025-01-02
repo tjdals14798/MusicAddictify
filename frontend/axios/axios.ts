@@ -13,4 +13,17 @@ const Instance: AxiosInstance = axios.create({
   },
 });
 
+export const refreshAccessToken = async (): Promise<string | null> => {
+  try {
+    const res = await Instance.post("/auth/refresh", {
+      withCredentials: true,
+    });
+    const { accessToken } = res.data;
+    return accessToken;
+  } catch (error) {
+    console.error(`Access Token 갱신 실패 ${error}`);
+    return null;
+  }
+};
+
 export default Instance;

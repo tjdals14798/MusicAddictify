@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import Instance from "../../axios";
+import Instance from "../../axios/axios";
 import { userActions } from "../redux/reducer/userSlice";
 
 const Login: React.FC = () => {

@@ -15,7 +15,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     // userName 업데이트 액션
-    setAccessToken: (state, action: PayloadAction<string>) => {
+    setAccessToken: (state, action: PayloadAction<string | null>) => {
       state.accessToken = action.payload;
     },
     // 초기화 액션
