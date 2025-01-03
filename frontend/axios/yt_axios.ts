@@ -14,7 +14,7 @@ const Instance_YT: AxiosInstance = axios.create({
 Instance_YT.interceptors.request.use((config) => {
   config.params = {
     ...config.params, // 기존 params 유지
-    part: "snippet,statistics",
+    part: "snippet",
     key: import.meta.env.VITE_YT_DATA_API_KEY, // API 키 추가
   };
   return config;
